@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkSwift // Premium URL Shortener & Analytics</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="/static/style.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- <link rel="stylesheet" href="style.css"> -->
+</head>
+<body>
+    <!-- Background Decor Elements -->
+    <div class="decor-blob blob-1"></div>
+    <div class="decor-blob blob-2"></div>
+    <div class="decor-blob blob-3"></div>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-logo">
+                    <i class="fa-solid fa-bolt logo-icon"></i>
+                </div>
+                <span class="brand-name">LinkSwift</span>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" id="nav-dashboard">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="https://github.com" target="_blank" class="nav-item">
+                    <i class="fa-solid fa-book"></i>
+                    <span>Documentation</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <span class="version-tag">v1.0.0</span>
+                <span class="developer-tag">Powered by FastAPI</span>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="app-header">
+                <div class="header-title-area">
+                    <h1>URL Shortener & Analytics</h1>
+                    <p class="subtitle">Shorten, share, and track your links with advanced analytics</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" id="btn-refresh-data">
+                        <i class="fa-solid fa-arrows-rotate"></i> Refresh Dashboard
+                    </button>
+                </div>
+            </header>
+
+            <!-- URL Shortener Tool Card -->
+            <section class="shortener-section">
+                <div class="glass-card shortener-card">
+                    <div class="card-glow"></div>
+                    <form id="shortener-form">
+                        <div class="form-grid">
+                            <div class="input-wrapper url-input-wrapper">
+                                <i class="fa-solid fa-link input-icon"></i>
+                                <input type="text" id="original-url" placeholder="Paste your long link here..." required>
+                            </div>
+                            <div class="input-wrapper custom-input-wrapper">
+                                <span class="custom-prefix">/</span>
+                                <input type="text" id="custom-code" placeholder="custom-alias (optional)">
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="btn-shorten">
+                                <span>Shorten</span> <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Shortener Result Panel (Hidden by default) -->
+                    <div class="result-panel" id="result-panel" style="display: none;">
+                        <div class="result-divider"></div>
+                        <div class="result-content">
+                            <div class="result-details">
+                                <span class="result-label">Your shortened link is ready:</span>
+                                <a href="#" target="_blank" class="result-url" id="shortened-url-link"></a>
+                            </div>
+                            <div class="result-actions">
+                                <button class="btn btn-success" id="btn-copy-result">
+                                    <i class="fa-solid fa-copy"></i> Copy Link
+                                </button>
+                                <button class="btn btn-secondary" id="btn-view-analytics-result">
+                                    <i class="fa-solid fa-chart-line"></i> View Analytics
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Stat Counters Panel -->
+            <section class="stats-overview-grid">
+                <div class="glass-card stat-card">
+                    <div class="stat-icon-box cyan-glow">
+                        <i class="fa-solid fa-link"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 class="stat-value" id="stat-total-urls">0</h3>
+                        <p class="stat-label">Total Short Links</p>
+                    </div>
+                </div>
+
+                <div class="glass-card stat-card">
+                    <div class="stat-icon-box purple-glow">
+                        <i class="fa-solid fa-arrow-pointer"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 class="stat-value" id="stat-total-clicks">0</h3>
+                        <p class="stat-label">Total Clicks</p>
+                    </div>
+                </div>
+
+                <div class="glass-card stat-card">
+                    <div class="stat-icon-box blue-glow">
+                        <i class="fa-solid fa-globe"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 class="stat-value" id="stat-top-browser">None</h3>
+                        <p class="stat-label">Top Browser</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Two-Column Layout for URL List and Analytics details -->
+            <div class="dashboard-split-layout">
+                <!-- Left Column: URL Lists -->
+                <section class="urls-list-section">
+                    <div class="glass-card list-card">
+                        <div class="card-header">
+                            <h2>Recent Links</h2>
+                            <span class="badge" id="list-urls-count">0 URLs</span>
+                        </div>
+                        
+                        <div class="table-container">
+                            <table class="urls-table">
+                                <thead>
+                                    <tr>
+                                        <th>Original Link</th>
+                                        <th>Short Code</th>
+                                        <th>Clicks</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="urls-table-body">
+                                    <!-- URL rows injected dynamically -->
+                                    <tr class="table-loading-row">
+                                        <td colspan="4" class="text-center">
+                                            <i class="fa-solid fa-circle-notch fa-spin table-loader"></i> Loading links...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Right Column: Interactive Analytics Detail View -->
+                <section class="analytics-detail-section">
+                    <!-- Placeholder Card (Visible when no URL is selected) -->
+                    <div class="glass-card placeholder-card" id="analytics-placeholder">
+                        <div class="placeholder-icon">
+                            <i class="fa-solid fa-chart-line-up"></i>
+                            <i class="fa-solid fa-chart-simple"></i>
+                        </div>
+                        <h3>Select a Link</h3>
+                        <p>Choose any shortened link from the list to view its complete clicks, device types, operating systems, and referrer analytics in real-time.</p>
+                    </div>
+
+                    <!-- Analytics Graph and Details Panel (Hidden by default) -->
+                    <div class="analytics-panel" id="analytics-panel" style="display: none;">
+                        <!-- Selected URL Header Info Card -->
+                        <div class="glass-card analytics-info-card">
+                            <div class="analytics-info-header">
+                                <span class="analytics-code-badge" id="selected-short-code">CODE</span>
+                                <div class="analytics-info-actions">
+                                    <button class="btn btn-icon-only" id="btn-copy-selected" title="Copy Short Link">
+                                        <i class="fa-solid fa-copy"></i>
+                                    </button>
+                                    <a href="#" target="_blank" class="btn btn-icon-only" id="btn-visit-selected" title="Visit Short Link">
+                                        <i class="fa-solid fa-external-link"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <h2 class="selected-original-url" id="selected-original-url">https://example.com/long-url-path</h2>
+                            <div class="selected-meta">
+                                <span><i class="fa-solid fa-calendar-days"></i> Created: <span id="selected-created-date">-</span></span>
+                                <span><i class="fa-solid fa-chart-bar"></i> Total Clicks: <strong id="selected-clicks-count">0</strong></span>
+                            </div>
+                        </div>
+
+                        <!-- Graph 1: Clicks Over Time Line Chart -->
+                        <div class="glass-card chart-card">
+                            <div class="card-header">
+                                <h3>Clicks Over Time</h3>
+                            </div>
+                            <div class="chart-wrapper">
+                                <canvas id="chart-clicks-time"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Grid 1: Browser & OS Distribution -->
+                        <div class="charts-double-row">
+                            <div class="glass-card chart-card flex-half">
+                                <div class="card-header">
+                                    <h3>Browsers</h3>
+                                </div>
+                                <div class="chart-wrapper doughnut-wrapper">
+                                    <canvas id="chart-browsers"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="glass-card chart-card flex-half">
+                                <div class="card-header">
+                                    <h3>Operating Systems</h3>
+                                </div>
+                                <div class="chart-wrapper doughnut-wrapper">
+                                    <canvas id="chart-os"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Grid 2: Device & Referrers -->
+                        <div class="charts-double-row">
+                            <div class="glass-card chart-card flex-half">
+                                <div class="card-header">
+                                    <h3>Devices</h3>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <canvas id="chart-devices"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="glass-card chart-card flex-half">
+                                <div class="card-header">
+                                    <h3>Traffic Sources</h3>
+                                </div>
+                                <div class="referrer-list-container" id="referrer-list-container">
+                                    <!-- Dynamic Referrers List -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Click Details Log -->
+                        <div class="glass-card list-card mt-20">
+                            <div class="card-header">
+                                <h3>Recent Clicks Log</h3>
+                            </div>
+                            <div class="table-container mini-table">
+                                <table class="urls-table clicks-log-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Timestamp</th>
+                                            <th>Browser / OS</th>
+                                            <th>Device</th>
+                                            <th>Referrer</th>
+                                            <th>IP Address</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="clicks-log-body">
+                                        <!-- raw clicks logs injected dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="toast" id="toast-notification">
+        <i class="fa-solid fa-circle-check toast-icon"></i>
+        <span class="toast-message">Copied to clipboard!</span>
+    </div>
+
+    <script src="/static/app.js"></script>
+    <!-- <script src="app.js"></script> -->
+</body>
+</html>
